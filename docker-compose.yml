@@ -1,0 +1,75 @@
+services:
+  backend:
+    build:
+      context: ./Backend
+    env_file:
+      - .env
+    container_name: swigntt-backend
+    ports:
+      - 8001:8001
+    depends_on:
+      - db
+    volumes:
+      - swingtt_static:/app/staticfiles
+    networks:
+      - swingtt-network
+
+  frontend:
+    build:
+      context: ./front-end
+    container_name: swingtt-frontend
+    ports:
+      - "3500:80"
+    depends_on:
+      - backend
+    volumes:
+      - swingtt_static:/app/staticfiles
+    networks:
+      - swingtt-network
+
+  db:
+    image: postgres:15
+    container_name: swingtt-db
+    restart: always
+    environment:
+      POSTGRES_DB: cryptotracker_db
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: admin
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - swingtt-network
+
+  fetchprice:
+    build:
+      context: ./FetchDataMicroService
+    env_file:
+      - .env
+    container_name: swingtt-fetchprice
+    networks:
+      - swingtt-network
+
+  minio:
+    image: minio/minio
+    container_name: minio
+    restart: always
+    command: server /data --console-address ":9001"
+    environment:
+      MINIO_ROOT_USER: admin
+      MINIO_ROOT_PASSWORD: admin007875admin
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    volumes:
+      - minio_data:/data
+    networks:
+      - swingtt-network
+
+volumes:
+  postgres_data:
+  minio_data:
+  swingtt_static:
+
+networks:
+  swingtt-network:
+    driver: bridge
