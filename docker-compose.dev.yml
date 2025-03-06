@@ -1,0 +1,82 @@
+version: '3.8'
+
+services:
+  backend:
+    build:
+      context: ./Backend
+      dockerfile: dockerfile.dev
+    env_file:
+      - .env.dev
+    ports:
+      - "8101:8001"
+    volumes:
+      - ./Backend:/app
+      - swingtt_static_dev:/app/staticfiles
+    depends_on:
+      - db_dev
+    networks:
+      - swingtt-network-dev
+
+  frontend:
+    build:
+      context: ./front-end
+      dockerfile: dockerfile.dev
+    env_file:
+      - .env.dev
+    ports:
+      - "3600:5173"
+    volumes:
+      - ./front-end:/app
+      - /app/node_modules
+    depends_on:
+      - backend
+    networks:
+      - swingtt-network-dev
+
+  db_dev:
+    image: postgres:15
+    environment:
+      POSTGRES_DB: cryptotracker_db_dev
+      POSTGRES_USER: dev_admin
+      POSTGRES_PASSWORD: dev_password
+    volumes:
+      - postgres_data_dev:/var/lib/postgresql/data
+    networks:
+      - swingtt-network-dev
+
+  fetchprice:
+    build:
+      context: ./FetchDataMicroService
+      dockerfile: dockerfile.dev
+    env_file:
+      - .env.dev
+    volumes:
+      - ./FetchDataMicroService:/app
+    ports:
+      - "8181:8081"
+    networks:
+      - swingtt-network-dev
+
+  minio_dev:
+    image: minio/minio
+    command: server /data --console-address ":9001"
+    environment:
+      MINIO_ROOT_USER: dev_admin
+      MINIO_ROOT_PASSWORD: dev_secret
+      MINIO_DOMAIN: minio_dev
+    ports:
+      - "9100:9000"
+      - "9101:9001"
+    volumes:
+      - minio_data_dev:/data
+    networks:
+      - swingtt-network-dev
+
+volumes:
+  postgres_data_dev:
+  minio_data_dev:
+  swingtt_static_dev:
+
+networks:
+  swingtt-network-dev:
+    driver: bridge

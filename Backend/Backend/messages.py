@@ -13,6 +13,7 @@ response_message = {
     402: "Invalid refresh token",
     403: "Invalid Credentials",
     404: "Not found",
+    407: "You cannot delete closed box transactions",
 
     500: "Unexpected error accord please try again later.."
 }

@@ -1,0 +1,59 @@
+name: Build, Push, and Deploy
+
+on:
+  push:
+    branches:
+      - master
+      - develop
+
+jobs:
+  build:
+    name: Build and Push Images
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+
+      - name: Log in to DockerHub
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+
+      - name: Build and push backend image
+        run: |
+          docker build -t erfanhooman/swingtt-backend:latest -f ./backend/Dockerfile .
+          docker push erfanhooman/swingtt-backend:latest
+
+      - name: Build and push frontend image
+        run: |
+          docker build -t erfanhooman/swingtt-frontend:latest -f ./frontend/Dockerfile .
+          docker push erfanhooman/swingtt-frontend:latest
+
+      - name: Build and push fetchprice image
+        run: |
+          docker build -t erfanhooman/swingtt-fetchprice:latest -f ./fetchprice/Dockerfile .
+          docker push erfanhooman/swingtt-fetchprice:latest
+
+  deploy:
+    name: Deploy to Docker Swarm
+    needs: build
+    runs-on: self-hosted
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
+      - name: Deploy Based on Branch
+        run: |
+          if [ "${GITHUB_REF##*/}" = "main" ]; then
+            echo "Deploying Production Stack"
+            docker stack deploy -c docker-compose.prod.yml production_stack
+          elif [ "${GITHUB_REF##*/}" = "testing" ]; then
+            echo "Deploying Testing Stack"
+            docker stack deploy -c docker-compose.test.yml testing_stack
+          else
+            echo "Branch not configured for deployment"
+          fi

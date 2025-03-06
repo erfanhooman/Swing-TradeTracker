@@ -2,7 +2,7 @@ version: '3.8'
 
 services:
   backend:
-    image: erfanhooman/swingtt-backend:1.0.0
+    image: erfanhooman/swingtt-backend:1.0.2
     env_file:
       - .env
     ports:
@@ -35,6 +35,8 @@ services:
 
   db:
     image: postgres:15
+    ports:
+      - 5432:5432
     environment:
       POSTGRES_DB: cryptotracker_db
       POSTGRES_USER: admin

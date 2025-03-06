@@ -171,11 +171,53 @@ class TransactionDeleteAPIView(APIView):
     )
     def delete(self, request, transaction_id):
         user = request.user
+
         try:
             transaction = Transaction.objects.get(id=transaction_id, user=user)
-            transaction.delete()
-            return create_response(success=True, message=mt[207],
-                                   status=status.HTTP_204_NO_CONTENT)
+            box = transaction.box
+            balance = user.balance
+            fee_multiplier = Decimal('1') - (transaction.fee / Decimal('100'))
+
+            if box.is_closed:
+                return create_response(success=False, message=mt[407], status=status.HTTP_400_BAD_REQUEST)
+
+            with db_transaction.atomic():
+                if transaction.type == 'buy':
+
+                    balance.deposit((transaction.amount / fee_multiplier) * transaction.price)
+
+                    box.total_amount -= transaction.amount
+                    box.total_buy_value -= transaction.value
+                    box.total_buy_amount -= transaction.amount
+
+                    if box.total_buy_amount > 0:
+                        box.average_buy_price = box.total_buy_value / box.total_buy_amount
+                    else:
+                        box.average_buy_price = Decimal('0')
+
+                elif transaction.type == 'sell':
+                    balance.withdraw(transaction.value * (Decimal('1') - transaction.fee / Decimal('100')))
+
+                    box.total_amount += transaction.amount
+                    box.total_sell_value -= transaction.value
+                    box.total_sell_amount -= transaction.amount
+
+                    if box.total_sell_amount > 0:
+                        box.average_sell_price = box.total_sell_value / box.total_sell_amount
+                    else:
+                        box.average_sell_price = Decimal('0')
+
+                transaction.delete()
+                
+                balance.save()
+                box.save()
+
+                if not box.transactions.exists():
+                    box.delete()
+
+                return create_response(success=True, message=mt[207], status=status.HTTP_200_OK)
         except Transaction.DoesNotExist:
-            return create_response(success=False, message=mt[404],
-                                   status=status.HTTP_404_NOT_FOUND)
+            return create_response(success=False, message=mt[404], status=status.HTTP_404_NOT_FOUND)
+        except Exception as e:
+            logger.error(f"Error deleting transaction: {e}")
+            return create_response(success=False, message=mt[400], status=status.HTTP_500_INTERNAL_SERVER_ERROR)

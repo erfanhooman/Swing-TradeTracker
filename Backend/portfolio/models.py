@@ -156,11 +156,13 @@ class Transaction(models.Model):
 
 
         elif self.type == 'sell':
+
             box.total_amount -= self.amount
             box.total_sell_value += self.value
             box.total_sell_amount += self.amount
 
             balance.deposit(self.value * (Decimal('1') - self.fee / Decimal('100')))
+
             box.save()
 
             box.average_sell_price = box.total_sell_value / box.total_sell_amount

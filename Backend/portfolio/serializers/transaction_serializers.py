@@ -61,7 +61,7 @@ class TransactionSerializer(serializers.Serializer):
 
             return coin_symbol.upper(), coin_name
         except requests.RequestException as e:
-            logger.error(f"went wrong on sending request: {e}")
+            logger.error(f"went wrong on sending request: {e} to the {url}")
             raise requests.RequestException(mt[500])
 
     def validate(self, data):

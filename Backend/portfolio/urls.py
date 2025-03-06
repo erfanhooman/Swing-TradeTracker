@@ -27,7 +27,7 @@ urlpatterns = [
 
     # Transactions
     path("transactions/", TransactionCreateAPIView.as_view(), name="create-transaction"),
-    # path("transactions/<int:transaction_id>/", TransactionDeleteAPIView.as_view(), name="create-transaction"), # Work on it
+    path("transactions/<int:transaction_id>/", TransactionDeleteAPIView.as_view(), name="create-transaction"), # Work on it
     # balance
     path("balance/", BalanceAPIView.as_view(), name="user-balance"),
     # Box
