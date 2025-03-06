@@ -215,7 +215,7 @@ class TransactionDeleteAPIView(APIView):
                 if not box.transactions.exists():
                     box.delete()
 
-                return create_response(success=True, message=mt[207], status=status.HTTP_200_OK)
+                return create_response(success=True, message=mt[207], status=status.HTTP_204_NO_CONTENT)
         except Transaction.DoesNotExist:
             return create_response(success=False, message=mt[404], status=status.HTTP_404_NOT_FOUND)
         except Exception as e:
