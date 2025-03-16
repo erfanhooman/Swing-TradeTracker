@@ -752,6 +752,7 @@ function Dashboard() {
                         onClose={() => setShowAddTransaction(false)}
                         onSubmit={handleAddTransaction}
                         loading={loading}
+                        openBoxes={openBoxes}
                     />
                 )}
             </AnimatePresence>
