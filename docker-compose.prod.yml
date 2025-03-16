@@ -2,7 +2,7 @@ version: '3.8'
 
 services:
   backend:
-    image: erfanhooman/swingtt-backend:1.0.2
+    image: erfanhooman/swingtt-backend:1.0.3
     env_file:
       - .env
     ports:
@@ -79,10 +79,25 @@ services:
       restart_policy:
         condition: on-failure
 
+  redis:
+    image: redis:7
+    command: redis-server --save 60 1 --loglevel warning
+    ports:
+      - "6380:6379"
+    volumes:
+      - redis_data:/data
+    networks:
+      - swingtt-network
+    deploy:
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+
 volumes:
   postgres_data:
   minio_data:
   swingtt_static:
+  redis_data:
 
 networks:
   swingtt-network:
