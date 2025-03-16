@@ -1,4 +1,5 @@
 import logging
+from decimal import Decimal
 
 from drf_yasg import openapi
 from drf_yasg.utils import swagger_auto_schema
@@ -36,7 +37,10 @@ class BoxListAPIView(APIView):
 
         coin_symbols = list(set(box.coin.symbol for box in boxes))
 
-        price_data = fetch_multiple_prices(coin_symbols)
+        if not closed:
+            price_data = fetch_multiple_prices(coin_symbols)
+        else:
+            price_data = {symbol: Decimal(0) for symbol in coin_symbols}
 
         serializer = BoxSerializer(boxes, many=True, context={'price_data': price_data})
 

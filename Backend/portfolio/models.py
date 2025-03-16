@@ -2,7 +2,6 @@ from decimal import Decimal
 
 from django.contrib.auth.models import User
 from django.db import models
-from django.template.defaultfilters import default
 from django.utils.timezone import now
 
 from Backend.messages import serializer_response_message as mst
@@ -44,7 +43,6 @@ class Balance(models.Model):
     def get_coin_balance(self):
         """Calculate total value of coins the user holds in USDT."""
         boxes = Box.objects.filter(user=self.user, is_closed=False)
-
         coin_symbols = list(set(box.coin.symbol for box in boxes))
         coin_prices = fetch_multiple_prices(coin_symbols)
 
