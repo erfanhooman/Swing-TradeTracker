@@ -9,6 +9,7 @@ from rest_framework import serializers
 from Backend.messages import response_message as mt
 from Backend.messages import serializer_response_message as smt
 from ..models import Box, Transaction, Balance, Coin
+from ..utils import fetch_multiple_prices
 
 logger = logging.getLogger("backend")
 
@@ -117,6 +118,31 @@ class TransactionSerializer(serializers.Serializer):
 
 
 class TransactionDataSerializer(serializers.ModelSerializer):
+    profit_loss_percentage = serializers.SerializerMethodField()
+
     class Meta:
         model = Transaction
-        fields = ["id", "type" ,"amount", "value", "price", "profit_loss_value", "profit_loss_percentage", "transaction_date"]
+        fields = ["id", "type" ,"amount", "value", "price", "profit_loss_value", "profit_loss_percentage",
+                  "transaction_date"]
+
+
+    def get_profit_loss_percentage(self, obj):
+        """Calculate profit/loss percentage based on current price for 'buy' transactions.
+        If it's a 'sell' transaction, return the stored value from the database.
+        """
+
+        if obj.type == "buy":
+            try:
+                current_price = fetch_multiple_prices([obj.box.coin.symbol])
+                logger.debug(f"try to fetch the % for the {obj.box.coin.name}-{obj.id} with the price of {current_price}")
+                if current_price == 0:
+                    return 0
+                if current_price and obj.price > 0:
+                    return ((Decimal(current_price[obj.box.coin.symbol]) - obj.price) / obj.price) * 100
+            except Exception as e:
+                logger.error(f"Something went wrong on fetching detail: {e}")
+                return None
+        elif obj.type == "sell":
+            return obj.profit_loss_percentage
+
+        return None

@@ -47,6 +47,9 @@ class BoxSerializer(serializers.ModelSerializer):
 
     def get_profit_loss_value(self, obj):
         """Calculate profit/loss using pre-fetched price data."""
+        if obj.is_closed:
+            return obj.total_sell_value - obj.total_buy_value
+
 
         price_data = self.context.get("price_data", {})
         current_price = price_data.get(obj.coin.symbol, 0)
@@ -60,6 +63,9 @@ class BoxSerializer(serializers.ModelSerializer):
 
     def get_profit_loss_percentage(self, obj):
         """Calculate profit/loss percentage, ensuring division by zero is avoided."""
+        if obj.is_closed:
+            return (obj.total_sell_value - obj.total_buy_value) / obj.total_buy_value * 100
+
         price_data = self.context.get("price_data", {})
         current_price = price_data.get(obj.coin.symbol, 0)
 

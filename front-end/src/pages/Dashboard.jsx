@@ -297,10 +297,18 @@ function Dashboard() {
             </td>
             {transaction.type === "sell" && (
                 <>
-                    <td className="px-6 py-3 text-center whitespace-nowrap text-green-400">
+                    <td className={`px-6 py-3 text-center whitespace-nowrap ${
+                        transaction.profit_loss_value > 0
+                            ? "text-green-400"
+                            : "text-red-400"
+                    }`}>
                         ${parseFloat(transaction.profit_loss_value).toFixed(2)}
                     </td>
-                    <td className="px-6 py-3 text-center whitespace-nowrap text-green-400">
+                    <td className={`px-6 py-3 text-center whitespace-nowrap ${
+                        transaction.profit_loss_percentage > 0
+                            ? "text-green-400"
+                            : "text-red-400"
+                    }`}>
                         {parseFloat(transaction.profit_loss_percentage).toFixed(2)}%
                     </td>
                 </>
@@ -310,7 +318,12 @@ function Dashboard() {
                 <>
                     <td className="px-6 py-3 text-center whitespace-nowrap text-green-400">
                     </td>
-                    <td className="px-6 py-3 text-center whitespace-nowrap text-green-400">
+                    <td className={`px-6 py-3 text-center whitespace-nowrap ${
+                        transaction.profit_loss_percentage > 0
+                            ? "text-green-400"
+                            : "text-red-400"
+                    }`}>
+                        {parseFloat(transaction.profit_loss_percentage).toFixed(2)}%
                     </td>
                 </>
             )}
