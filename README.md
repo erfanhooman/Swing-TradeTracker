@@ -1,4 +1,4 @@
-![image](https://github.com/user-attachments/assets/66743f78-3385-4c85-a31e-9cd90d338a98)![image](https://github.com/user-attachments/assets/0e731d6d-b95a-47aa-b745-2a16bd00dfb5)# Swing Trade Tracker 🚀
+# Swing Trade Tracker 🚀
 
 ## Description
 Swing Trade Tracker is a powerful and easy-to-use trade tracking system for traders who want to stay on top of their transactions. Just enter your trade details, and the system will automatically calculate your profit/loss per trade and give you an overall view of your assets and financial performance. No more manual calculations—let the system do the work for you! 📈💰
@@ -9,6 +9,8 @@ Swing Trade Tracker is a powerful and easy-to-use trade tracking system for trad
 - **Asset Overview**: Gives you a real-time snapshot of all your holdings.
 - **Web-Based Interface**: Simply open your browser and start tracking!
 - **Production-Ready Deployment**: Set up easily with Docker Compose and Docker Swarm.
+
+![image](https://github.com/user-attachments/assets/0e731d6d-b95a-47aa-b745-2a16bd00dfb5)
 
 ## Tech Stack & Why We Use It ⚙️
 Swing Trade Tracker is built with a powerful, modern stack to keep things **fast, scalable, and reliable**:
