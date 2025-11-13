@@ -178,7 +178,7 @@ class TransactionDeleteAPIView(APIView):
             balance = user.balance
             fee_multiplier = Decimal('1') - (transaction.fee / Decimal('100'))
 
-            last_transaction = box.transactions.order_by('-created_at').first()
+            last_transaction = box.transactions.order_by('-transaction_date').first()
 
             if transaction != last_transaction:
                 return create_response(success=False, message=mt[408], status=status.HTTP_400_BAD_REQUEST)

@@ -2,7 +2,7 @@ version: '3.8'
 
 services:
   backend:
-    image: erfanhooman/swingtt-backend:1.0.3
+    image: erfanhooman/swingtt-backend:latest
     env_file:
       - .env
     ports:
@@ -19,7 +19,9 @@ services:
         condition: on-failure
 
   frontend:
-    image: erfanhooman/swingtt-frontend:1.0.1
+    image: erfanhooman/swingtt-frontend:1.1.0.temp
+    env_file:
+      - .env
     ports:
       - "3500:80"
     depends_on:
@@ -51,7 +53,7 @@ services:
         condition: on-failure
 
   fetchprice:
-    image: erfanhooman/swingtt-fetchprice:1.0.0
+    image: erfanhooman/swingtt-fetchprice:1.1.0
     env_file:
       - .env
     networks:
